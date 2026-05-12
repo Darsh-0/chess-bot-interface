@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+body  {
+    background-color: #FDEEAE;
+}
+
+body {
+    font-family: 'Short Stack', cursive;
+}
+
+.page-center {
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+center {
+    display: flex;
+}
