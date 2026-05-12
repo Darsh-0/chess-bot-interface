@@ -16,7 +16,7 @@ function App() {
                     <OptionsPicker />
                 </div>
 
-                <div className="doodle">
+                <div className="doodle w-[500px]">
                     <CustomChessboard />
                 </div>
             </div>

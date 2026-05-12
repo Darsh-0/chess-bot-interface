@@ -1,192 +1,228 @@
-﻿import {Chessboard, type PieceDropHandlerArgs, type SquareHandlerArgs} from 'react-chessboard';
-import {Chess, type Square} from "chess.js";
-import {useRef, useState} from "react";
+﻿import {
+    Chessboard,
+    defaultPieces,
+    type PieceDropHandlerArgs,
+    type PieceRenderObject,
+} from 'react-chessboard';
+import { Chess, type PieceSymbol, type Square } from 'chess.js';
+import { useCallback, useRef, useState } from 'react';
+
+type PromotionMove = { sourceSquare: Square; targetSquare: Square };
+
+function getStatus(game: Chess): string {
+    const turn = game.turn() === 'w' ? 'White' : 'Black';
+    if (game.isCheckmate()) return `Checkmate — ${turn === 'White' ? 'Black' : 'White'} wins!`;
+    if (game.isStalemate()) return 'Stalemate — draw';
+    if (game.isThreefoldRepetition()) return 'Draw by repetition';
+    if (game.isInsufficientMaterial()) return 'Draw — insufficient material';
+    if (game.isDraw()) return 'Draw';
+    if (game.isCheck()) return `${turn} is in check`;
+    return `${turn}'s turn`;
+}
 
 function CustomChessboard() {
-    // create a chess game using a ref to always have access to the latest game state within closures and maintain the game state across renders
     const chessGameRef = useRef(new Chess());
     const chessGame = chessGameRef.current;
 
-    // track the current position of the chess game in state to trigger a re-render of the chessboard
-    const [chessPosition, setChessPosition] = useState(chessGame.fen());
-    const [moveFrom, setMoveFrom] = useState('');
-    const [optionSquares, setOptionSquares] = useState({});
+    const [position, setPosition] = useState(chessGame.fen());
+    const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null);
+    const [status, setStatus] = useState(() => getStatus(chessGame));
+    const [isGameOver, setIsGameOver] = useState(false);
 
-    // make a random "CPU" move
-    function makeRandomMove() {
-        // get all possible moves`
-        const possibleMoves = chessGame.moves();
+    const commitPosition = useCallback(() => {
+        setPosition(chessGame.fen());
+        setStatus(getStatus(chessGame));
+        setIsGameOver(chessGame.isGameOver());
+    }, [chessGame]);
 
-        // exit if the game is over
-        if (chessGame.isGameOver()) {
-            return;
-        }
-
-        // pick a random move
-        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-
-        // make the move
-        chessGame.move(randomMove);
-
-        // update the position state
-        setChessPosition(chessGame.fen());
+    /** Use verbose moves so we can reliably detect promotions for both colours. */
+    function isPromotionMove(from: Square, to: Square): boolean {
+        return chessGame
+            .moves({ verbose: true })
+            .some(m => m.from === from && m.to === to && m.promotion !== undefined);
     }
 
-    // get the move options for a square to show valid moves
-    function getMoveOptions(square: Square) {
-        // get the moves for the square
-        const moves = chessGame.moves({
-            square,
-            verbose: true
-        });
+    function onPieceDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs): boolean {
+        if (!targetSquare || isGameOver) return false;
 
-        // if no moves, clear the option squares
-        if (moves.length === 0) {
-            setOptionSquares({});
-            return false;
+        const from = sourceSquare as Square;
+        const to = targetSquare as Square;
+
+        if (isPromotionMove(from, to)) {
+            setPromotionMove({ sourceSquare: from, targetSquare: to });
+            // Return true so the piece snaps back while the dialog is shown.
+            // The move isn't committed yet.
+            return true;
         }
 
-        // create a new object to store the option squares
-        const newSquares: Record<string, React.CSSProperties> = {};
-
-        // loop through the moves and set the option squares
-        for (const move of moves) {
-            newSquares[move.to] = {
-                background: chessGame.get(move.to) && chessGame.get(move.to)?.color !== chessGame.get(square)?.color ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)' // larger circle for capturing
-                    : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
-                // smaller circle for moving
-                borderRadius: '50%'
-            };
-        }
-
-        // set the square clicked to move from to yellow
-        newSquares[square] = {
-            background: 'rgba(255, 255, 0, 0.4)'
-        };
-
-        // set the option squares
-        setOptionSquares(newSquares);
-
-        // return true to indicate that there are move options
-        return true;
-    }
-    function onSquareClick({
-                               square,
-                               piece
-                           }: SquareHandlerArgs) {
-        // piece clicked to move
-        if (!moveFrom && piece) {
-            // get the move options for the square
-            const hasMoveOptions = getMoveOptions(square as Square);
-
-            // if move options, set the moveFrom to the square
-            if (hasMoveOptions) {
-                setMoveFrom(square);
-            }
-
-            // return early
-            return;
-        }
-
-        // square clicked to move to, check if valid move
-        const moves = chessGame.moves({
-            square: moveFrom as Square,
-            verbose: true
-        });
-        const foundMove = moves.find(m => m.from === moveFrom && m.to === square);
-
-        // not a valid move
-        if (!foundMove) {
-            // check if clicked on new piece
-            const hasMoveOptions = getMoveOptions(square as Square);
-
-            // if new piece, setMoveFrom, otherwise clear moveFrom
-            setMoveFrom(hasMoveOptions ? square : '');
-
-            // return early
-            return;
-        }
-
-        // is normal move
         try {
-            chessGame.move({
-                from: moveFrom,
-                to: square,
-                promotion: 'q'
-            });
-        } catch {
-            // if invalid, setMoveFrom and getMoveOptions
-            const hasMoveOptions = getMoveOptions(square as Square);
-
-            // if new piece, setMoveFrom, otherwise clear moveFrom
-            if (hasMoveOptions) {
-                setMoveFrom(square);
-            }
-
-            // return early
-            return;
-        }
-
-        // update the position state
-        setChessPosition(chessGame.fen());
-
-        // make random cpu move after a short delay
-        setTimeout(makeRandomMove, 300);
-
-        // clear moveFrom and optionSquares
-        setMoveFrom('');
-        setOptionSquares({});
-    }
-
-    // handle piece drop
-    function onPieceDrop({
-                             sourceSquare,
-                             targetSquare
-                         }: PieceDropHandlerArgs) {
-        // type narrow targetSquare potentially being null (e.g. if dropped off board)
-        if (!targetSquare) {
-            return false;
-        }
-
-        // try to make the move according to chess.js logic
-        try {
-            chessGame.move({
-                from: sourceSquare,
-                to: targetSquare,
-                promotion: 'q' // always promote to a queen for example simplicity
-            });
-
-            // update the position state upon successful move to trigger a re-render of the chessboard
-            setChessPosition(chessGame.fen());
-
-            // clear moveFrom and optionSquares
-            setMoveFrom('');
-            setOptionSquares({});
-
-            // make random cpu move after a short delay
-            setTimeout(makeRandomMove, 500);
-
-            // return true as the move was successful
+            chessGame.move({ from, to });
+            commitPosition();
             return true;
         } catch {
-            // return false as the move was not successful
             return false;
         }
     }
 
-    // set the chessboard options
-    const chessboardOptions = {
-        onPieceDrop,
-        onSquareClick,
-        position: chessPosition,
-        squareStyles: optionSquares,
-        id: 'click-or-drag-to-move'
-    };
+    function onPromotionPieceSelect(piece: PieceSymbol) {
+        if (!promotionMove) return;
+        try {
+            chessGame.move({
+                from: promotionMove.sourceSquare,
+                to: promotionMove.targetSquare,
+                promotion: piece,
+            });
+            commitPosition();
+        } catch {
+            // Move was somehow invalid — silently cancel
+        }
+        setPromotionMove(null);
+    }
 
-    // render the chessboard
+    function cancelPromotion() {
+        // Re-apply the current FEN so the dragged piece snaps back correctly
+        setPosition(chessGame.fen());
+        setPromotionMove(null);
+    }
+
+    function resetGame() {
+        chessGame.reset();
+        setPromotionMove(null);
+        commitPosition();
+    }
+
+    // --- Promotion dialog positioning ---
+    // Use percentage-based left so it scales with any board size.
+    // Column 'a' = 0, 'h' = 7; each square is 12.5% of board width.
+    const promoCol = promotionMove ? 'abcdefgh'.indexOf(promotionMove.targetSquare[0]) : 0;
+    const promoRank = promotionMove ? parseInt(promotionMove.targetSquare[1], 10) : 0;
+    const isWhitePromo = promoRank === 8; // White promotes on 8, black on 1
+
+    // The pieces shown in the dialog should match the side that is promoting
+    const promoColor = chessGame.turn() === 'w' ? 'w' : 'b';
+
+    // Status pill styling
+    const statusStyle: React.CSSProperties = (() => {
+        if (chessGame.isCheckmate()) return { background: '#fee2e2', color: '#b91c1c' };
+        if (chessGame.isCheck())     return { background: '#fef9c3', color: '#a16207' };
+        if (chessGame.isGameOver())  return { background: '#f3f4f6', color: '#374151' };
+        return chessGame.turn() === 'w'
+            ? { background: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0' }
+            : { background: '#1e293b', color: '#f8fafc' };
+    })();
+
     return (
-        <div className="w-full max-w-[500px]">
-            <Chessboard options={chessboardOptions} />
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '1.5rem',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #e0e7ef 0%, #f8fafc 100%)',
+        }}>
+
+            {/* Status pill */}
+            <div style={{
+                padding: '0.4rem 1rem',
+                borderRadius: '99px',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                transition: 'all 0.2s',
+                ...statusStyle,
+            }}>
+                {status}
+            </div>
+
+            {/* Board wrapper */}
+            <div style={{ position: 'relative', width: '100%', maxWidth: 500 }}>
+
+                {/* Promotion overlay */}
+                {promotionMove && (
+                    <>
+                        {/* Dimmed backdrop — click to cancel */}
+                        <div
+                            onClick={cancelPromotion}
+                            onContextMenu={e => { e.preventDefault(); cancelPromotion(); }}
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: 'rgba(0,0,0,0.45)',
+                                zIndex: 1000,
+                                borderRadius: 4,
+                                cursor: 'pointer',
+                            }}
+                        />
+
+                        {/* Piece picker */}
+                        <div style={{
+                            position: 'absolute',
+                            [isWhitePromo ? 'top' : 'bottom']: 0,
+                            left: `${promoCol * 12.5}%`,
+                            width: '12.5%',
+                            zIndex: 1001,
+                            display: 'flex',
+                            flexDirection: isWhitePromo ? 'column' : 'column-reverse',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.45)',
+                            borderRadius: 6,
+                            overflow: 'hidden',
+                        }}>
+                            {(['q', 'r', 'n', 'b'] as PieceSymbol[]).map(piece => (
+                                <button
+                                    key={piece}
+                                    title={piece === 'q' ? 'Queen' : piece === 'r' ? 'Rook' : piece === 'n' ? 'Knight' : 'Bishop'}
+                                    onClick={() => onPromotionPieceSelect(piece)}
+                                    onContextMenu={e => e.preventDefault()}
+                                    style={{
+                                        width: '100%',
+                                        aspectRatio: '1',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        padding: 0,
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        background: 'white',
+                                        transition: 'background 0.12s',
+                                    }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = '#e0e7ef')}
+                                    onMouseLeave={e => (e.currentTarget.style.background = 'white')}
+                                >
+                                    {defaultPieces[
+                                        `${promoColor}${piece.toUpperCase()}` as keyof PieceRenderObject
+                                        ]?.()}
+                                </button>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                <Chessboard options={{ position, onPieceDrop, id: 'custom-board' }} />
+            </div>
+
+            {/* Controls */}
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                    onClick={resetGame}
+                    style={{
+                        padding: '0.5rem 1.25rem',
+                        borderRadius: '0.375rem',
+                        border: '1.5px solid #cbd5e1',
+                        background: 'white',
+                        color: '#1e293b',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        transition: 'all 0.15s',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'white')}
+                >
+                    New Game
+                </button>
+            </div>
         </div>
     );
 }
