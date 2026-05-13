@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  chess-app:
+    build: .
+    container_name: chess-app
+    ports:
+      - "4174:4174"
+    restart: unless-stopped
