@@ -1,6 +1,6 @@
 import './App.css';
 
-import CustomChessboard from "./components/chessboard.tsx";
+import ChessGame from "./components/chessboard.tsx";
 import NavigationBar from "./components/navigationbar.tsx";
 import OptionsPicker from "./components/optionspicker.tsx";
 
@@ -16,8 +16,8 @@ function App() {
                     <OptionsPicker />
                 </div>
 
-                <div className="doodle w-[500px]">
-                    <CustomChessboard />
+                <div className="doodle w-[600px]">
+                    <ChessGame />
                 </div>
             </div>
         </>
