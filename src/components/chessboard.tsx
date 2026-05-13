@@ -4,7 +4,7 @@ import {
     type PieceDropHandlerArgs,
     type SquareHandlerArgs,
 } from "react-chessboard";
-import {Chess, type PieceSymbol, type Square} from "chess.js";
+import {Chess, type Square} from "chess.js";
 
 function ChessGame() {
     const chessGameRef = useRef(new Chess());
@@ -19,7 +19,7 @@ function ChessGame() {
         Record<string, React.CSSProperties>
     >({});
 
-    function makeRandomMove() {
+    /**function makeRandomMove() {
         const possibleMoves = chessGame.moves();
 
         if (chessGame.isGameOver()) return;
@@ -30,7 +30,7 @@ function ChessGame() {
         chessGame.move(randomMove);
 
         setChessPosition(chessGame.fen());
-    }
+    }**/
 
     function getMoveOptions(square: Square) {
         const moves = chessGame.moves({
