@@ -30,10 +30,6 @@ const pieceImages = {
 const PIECE_VALUES: Record<PieceType, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 };
 const PIECE_ORDER: PieceType[] = ["p", "n", "b", "r", "q"];
 
-function materialScore(captured: Record<PieceType, number>): number {
-    return PIECE_ORDER.reduce((sum, p) => sum + captured[p] * PIECE_VALUES[p], 0);
-}
-
 function CapturedRow({ capturedColor, captured, advantage }: {
     capturedColor: Color;
     captured: Record<PieceType, number>;
@@ -264,7 +260,6 @@ function ChessGame({
         materialDiff,
     } = useChessGame();
 
-    const [showGameOver, setShowGameOver] = useState(false);
     const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
     useEffect(() => {
         if (humanPlaysAs === "random") {
@@ -280,15 +275,8 @@ function ChessGame({
         }
     }, [humanPlaysAs]);
 
-    useEffect(() => {
-        if (!gameStatus) return;
-
-        setShowGameOver(true);
-    }, [gameStatus]);
-
     function handleReset() {
         resetGame();
-        setShowGameOver(false);
         if (humanPlaysAs === "random") {
             setBoardOrientation(
                 Math.random() > 0.5
@@ -299,28 +287,6 @@ function ChessGame({
             setBoardOrientation(humanPlaysAs as "white" | "black");
         }
     }
-
-    function getGameOverText() {
-        if (!gameStatus) return "";
-
-        switch (gameStatus.type) {
-            case "checkmate":
-                return `${gameStatus.winner === "w" ? "White" : "Black"} wins by checkmate`;
-
-            case "stalemate":
-                return "Draw by stalemate";
-
-            case "draw":
-                return "Draw";
-
-            case "insufficient_material":
-                return "Draw by insufficient material";
-
-            default:
-                return "";
-        }
-    }
-
 
     return (
         <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-8"><div />
