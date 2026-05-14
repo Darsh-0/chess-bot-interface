@@ -1,7 +1,7 @@
 ﻿import { Chessboard } from "react-chessboard";
 import { useChessGame } from "./UseChessGame.tsx";
 import { useState, useEffect } from "react";
-import type {PieceSymbol} from "chess.js";
+import type {PieceSymbol, Square } from "chess.js";
 
 type Color = "w" | "b";
 type PieceType = "p" | "n" | "b" | "r" | "q";
@@ -27,7 +27,6 @@ const pieceImages = {
     },
 };
 
-const PIECE_VALUES: Record<PieceType, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 };
 const PIECE_ORDER: PieceType[] = ["p", "n", "b", "r", "q"];
 
 function CapturedRow({ capturedColor, captured, advantage }: {
@@ -195,10 +194,10 @@ function PromotionPicker({ color, targetSquare, boardOrientation, onSelect, onCa
 }
 
 function PromotionOverlay({ pendingPromotion, turn, boardOrientation, applyMove, cancelPromotion }: {
-    pendingPromotion: { from: string; to: string } | null;
+    pendingPromotion: { from: Square; to: Square } | null;
     turn: Color;
     boardOrientation: "white" | "black";
-    applyMove: (from: string, to: string, piece: PieceSymbol) => void;
+    applyMove: (from: Square, to: Square, piece: PieceSymbol) => void;
     cancelPromotion: () => void;
 }) {
     if (!pendingPromotion) return null;
