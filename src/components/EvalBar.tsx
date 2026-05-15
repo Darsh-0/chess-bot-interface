@@ -70,7 +70,7 @@ export default function EvalBar({
 
             setThinking(true);
 
-            const worker = new Worker(new URL("/stockfish-18-lite.js", import.meta.url));
+            const worker = new Worker(new URL("/stockfish-18-lite.js", import.meta.url), {type: "module"});
             engineRef.current = worker;
             const stm = sideToMove(currentFen);
 
