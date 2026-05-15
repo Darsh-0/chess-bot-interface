@@ -259,9 +259,9 @@ function ChessGame({
                        showEvalBar,
                    }: {
     humanPlaysAs: "white" | "black" | "random";
-    whitePlayer: string;
+    whitePlayer: PlayerType;
     setWhitePlayer: React.Dispatch<React.SetStateAction<PlayerType>>;
-    blackPlayer: string;
+    blackPlayer: PlayerType;
     setBlackPlayer: React.Dispatch<React.SetStateAction<PlayerType>>;
     showEvalBar: boolean;
 }) {
@@ -293,8 +293,8 @@ function ChessGame({
     function handleReset() {
         resetGame();
 
-        if (humanPlaysAs === "random") {
-            const oldWhitePlayer = whitePlayer;
+        if (humanPlaysAs === "random" && (Math.random() < 0.5)) {
+            const oldWhitePlayer: PlayerType = whitePlayer;
 
             setWhitePlayer(blackPlayer);
             setBlackPlayer(oldWhitePlayer);
