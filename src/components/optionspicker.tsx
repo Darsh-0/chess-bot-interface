@@ -1,16 +1,16 @@
 ﻿import type {PlayerType} from "../App.tsx";
+import {useEffect} from "react";
 
 type Props = {
     whitePlayer: PlayerType;
     blackPlayer: PlayerType;
     humanPlaysAs: "white" | "black" | "random";
-
+    showEvalBar: boolean;
     setWhitePlayer: (v: PlayerType) => void;
     setBlackPlayer: (v: PlayerType) => void;
+    setHumanPlaysAs: (v: "white" | "black" | "random") => void;
+    setShowEvalBar: (v: boolean) => void;
 
-    setHumanPlaysAs: (
-        v: "white" | "black" | "random"
-    ) => void;
 };
 
 
@@ -18,13 +18,19 @@ function OptionsPicker({
                            whitePlayer,
                            blackPlayer,
                            humanPlaysAs,
+                           showEvalBar,
                            setWhitePlayer,
                            setBlackPlayer,
                            setHumanPlaysAs,
+                           setShowEvalBar,
                        }: Props) {
 
-    const showHumanSideSelect =
-        (whitePlayer === "human") !== (blackPlayer === "human");
+    const showHumanSideSelect = (whitePlayer === "human") !== (blackPlayer === "human");
+    useEffect(() => {
+        if (!showHumanSideSelect) {
+            setHumanPlaysAs("random");
+        }
+    }, [showHumanSideSelect, setHumanPlaysAs]);
 
     return (
         <fieldset className="doodle-border flex flex-col gap-4 pt-5">
@@ -88,6 +94,17 @@ function OptionsPicker({
                     </select>
                 </div>
             )}
+            <div className="flex items-center gap-3">
+                <label htmlFor="showEvalBar">Show evaluation bar</label>
+                <div className="doodle !bg-transparent">
+                    <input
+                        type="checkbox"
+                        id="showEvalBar"
+                        checked={showEvalBar}
+                        onChange={(e) => setShowEvalBar(e.target.checked)}
+                    />
+                </div>
+            </div>
         </fieldset>
     );
 }

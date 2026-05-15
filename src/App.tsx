@@ -21,6 +21,8 @@ function App() {
     const [humanPlaysAs, setHumanPlaysAs] =
         useState<"white" | "black" | "random">("white");
 
+    const [showEvalBar, setShowEvalBar] = useState(true);
+
     return (
         <>
             <div className="pt-5">
@@ -33,6 +35,8 @@ function App() {
                         whitePlayer={whitePlayer}
                         blackPlayer={blackPlayer}
                         humanPlaysAs={humanPlaysAs}
+                        showEvalBar={showEvalBar}
+                        setShowEvalBar={setShowEvalBar}
                         setWhitePlayer={setWhitePlayer}
                         setBlackPlayer={setBlackPlayer}
                         setHumanPlaysAs={setHumanPlaysAs}
@@ -40,7 +44,7 @@ function App() {
                 </div>
 
                 <div className="w-[800px]">
-                    <ChessGame humanPlaysAs={humanPlaysAs}/>
+                    <ChessGame humanPlaysAs={humanPlaysAs} setHumanPlaysAs={setHumanPlaysAs} whitePlayer={whitePlayer} blackPlayer={blackPlayer} showEvalBar={showEvalBar}/>
                 </div>
             </div>
         </>

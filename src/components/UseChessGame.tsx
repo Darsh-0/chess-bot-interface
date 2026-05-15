@@ -1,6 +1,7 @@
-﻿import React, { useRef, useState } from "react";
+﻿import React, { useRef, useState, useEffect } from "react";
 import {Chess, type PieceSymbol, type Square} from "chess.js";
 import type { PieceDropHandlerArgs, SquareHandlerArgs } from "react-chessboard";
+import SelectMove from "../api/BotMoveSelector.tsx";
 
 type PieceType = "p" | "n" | "b" | "r" | "q";
 type Color = "w" | "b";
@@ -30,7 +31,7 @@ function materialScore(captured: Record<PieceType, number>): number {
     return PIECE_ORDER.reduce((sum, p) => sum + captured[p] * PIECE_VALUES[p], 0);
 }
 
-export function useChessGame() {
+export function useChessGame(whitePlayer: string, blackPlayer: string) {
     const chessRef = useRef(new Chess());
 
     const [position, setPosition] = useState(() => chessRef.current.fen());
@@ -47,6 +48,24 @@ export function useChessGame() {
     const [gameStatus, setGameStatus] = useState<GameStatus>(null);
 
     const [promotionBonus, setPromotionBonus] = useState({ w: 0, b: 0 });
+
+    function isBotTurn() {
+        const turn = chessRef.current.turn();
+
+        if (turn === "w") return whitePlayer !== "human";
+        if (turn === "b") return blackPlayer !== "human";
+        return false;
+    }
+
+    useEffect(() => {
+        const chess = chessRef.current;
+
+        if (isBotTurn) {
+            applyBotMove();
+        }
+    }, [position, whitePlayer, blackPlayer]);
+
+
 
     function getMoveOptions(square: Square): boolean {
         const chess = chessRef.current;
@@ -132,10 +151,30 @@ export function useChessGame() {
             setGameStatus(checkGameStatus(chess));
             setMoveFrom("");
             setOptionSquares({});
+            if (!checkHumanTurn()) {
+                applyBotMove();
+            }
         } catch {
             const hasMoveOptions = getMoveOptions(to);
             setMoveFrom(hasMoveOptions ? to : "");
         }
+    }
+
+    async function applyBotMove() {
+        const chess = chessRef.current;
+        const bot = chess.turn() === "w" ? whitePlayer : blackPlayer;
+
+        const result = await SelectMove(chess.fen(), bot);
+
+        if (!result?.bestmove) return;
+
+        const move = result.bestmove;
+
+        const from = move.slice(0, 2) as Square;
+        const to = move.slice(2, 4) as Square;
+        const promotion = move.slice(4, 5) || undefined;
+
+        applyMove(from, to, promotion as PieceSymbol);
     }
 
     function checkGameStatus(chess: Chess): GameStatus {
@@ -164,6 +203,7 @@ export function useChessGame() {
     }
 
     function onSquareClick({ square, piece }: SquareHandlerArgs) {
+        if (!checkHumanTurn()) return false
         if (!moveFrom && piece) {
             const hasMoveOptions = getMoveOptions(square as Square);
             if (hasMoveOptions) setMoveFrom(square);
@@ -172,7 +212,17 @@ export function useChessGame() {
         makeMove(moveFrom as Square, square as Square);
     }
 
+    function checkHumanTurn() {
+        const chess = chessRef.current;
+        if (whitePlayer != "human" && chess.turn() === "w" ||
+            blackPlayer != "human" && chess.turn() === "b") {
+            return false;
+        }
+        return true;
+    }
+
     function onPieceDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs): boolean {
+        if (!checkHumanTurn()) return false
         if (!targetSquare) return false;
         try {
             makeMove(sourceSquare as Square, targetSquare as Square);
@@ -196,6 +246,7 @@ export function useChessGame() {
     const whiteScore = materialScore(capturedPieces.w) + promotionBonus.b;
     const blackScore = materialScore(capturedPieces.b) + promotionBonus.w;
     const materialDiff = whiteScore - blackScore; // positive = black is ahead
+    const chessFEN = chessRef.current.fen();
 
     return {
         position,
@@ -211,5 +262,6 @@ export function useChessGame() {
         cancelPromotion: () => setPendingPromotion(null),
         resetGame,
         materialDiff,
+        chessFEN,
     };
 }

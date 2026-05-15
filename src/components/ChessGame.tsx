@@ -1,7 +1,20 @@
 ﻿import { Chessboard } from "react-chessboard";
 import { useChessGame } from "./UseChessGame.tsx";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useMemo} from "react";
 import type {PieceSymbol, Square } from "chess.js";
+import EvalBar from "./EvalBar.tsx";
+const pieces = import.meta.glob("../assets/pieces/*.svg", {
+    eager: true,
+    import: "default",
+}) as Record<string, string>;
+
+function getPiece(name: string) {
+    const entry = Object.entries(pieces).find(([path]) =>
+        path.includes(name)
+    );
+
+    return entry ? entry[1] : "";
+}
 
 type Color = "w" | "b";
 type PieceType = "p" | "n" | "b" | "r" | "q";
@@ -10,20 +23,20 @@ const PROMOTION_PIECES: PieceType[] = ["q", "r", "b", "n"];
 
 const pieceImages = {
     w: {
-        p: "https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg",
-        n: "https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg",
-        b: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg",
-        r: "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg",
-        q: "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg",
-        k: "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg",
+        p: getPiece("Chess_plt45.svg"),
+        n: getPiece("Chess_nlt45.svg"),
+        b: getPiece("Chess_blt45.svg"),
+        r: getPiece("Chess_rlt45.svg"),
+        q: getPiece("Chess_qlt45.svg"),
+        k: getPiece("Chess_klt45.svg"),
     },
     b: {
-        p: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg",
-        n: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg",
-        b: "https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg",
-        r: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg",
-        q: "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg",
-        k: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg",
+        p: getPiece("Chess_pdt45.svg"),
+        n: getPiece("Chess_ndt45.svg"),
+        b: getPiece("Chess_bdt45.svg"),
+        r: getPiece("Chess_rdt45.svg"),
+        q: getPiece("Chess_qdt45.svg"),
+        k: getPiece("Chess_kdt45.svg"),
     },
 };
 
@@ -239,8 +252,14 @@ function GameOverOverlay({ gameStatus, onReset }: {
 
 function ChessGame({
                        humanPlaysAs,
+                       setHumanPlaysAs,
+                       whitePlayer,
+                       blackPlayer,
+                       showEvalBar,
                    }: {
     humanPlaysAs: "white" | "black" | "random";
+    whitePlayer: string;
+    blackPlayer: string;
 }) {
 
     const {
@@ -257,85 +276,78 @@ function ChessGame({
         cancelPromotion,
         resetGame,
         materialDiff,
-    } = useChessGame();
+        chessFEN
+    } = useChessGame(whitePlayer, blackPlayer);
 
     const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
     useEffect(() => {
         if (humanPlaysAs === "random") {
-            setBoardOrientation(
-                Math.random() > 0.5
-                    ? "white"
-                    : "black"
-            );
+            setHumanPlaysAs(Math.random() > 0.5 ? "white" : "black");
         } else {
-            setBoardOrientation(
-                humanPlaysAs as "white" | "black"
-            );
+            setBoardOrientation(humanPlaysAs);
         }
+        console.log(humanPlaysAs);
     }, [humanPlaysAs]);
 
     function handleReset() {
         resetGame();
-        if (humanPlaysAs === "random") {
-            setBoardOrientation(
-                Math.random() > 0.5
-                    ? "white"
-                    : "black"
-            );
-        } else {
-            setBoardOrientation(humanPlaysAs as "white" | "black");
-        }
     }
 
     return (
-        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-8"><div />
+        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-8">
+            <div />
 
-            <div className="doodle-border doodle relative w-fit">
+            {/* Center column: EvalBar + Board side by side */}
+            <div className="flex items-start gap-2">
+                <div className={`doodle ${showEvalBar ? "" : "invisible"}`}>
+                    <EvalBar fen={chessFEN} orientation={boardOrientation} depth={15} height={480} />
+                </div>
+                <div className="doodle-border doodle relative w-fit rounded-lg">
+                    <Chessboard
+                        options={{
+                            position,
+                            squareStyles: optionSquares,
+                            onSquareClick,
+                            onPieceDrop,
+                            boardOrientation,
+                            id: "click-or-drag-to-move",
+                        }}
+                    />
 
-                <Chessboard
-                    options={{
-                        position,
-                        squareStyles: optionSquares,
-                        onSquareClick,
-                        onPieceDrop,
-                        boardOrientation,
-                        id: "click-or-drag-to-move",
-                    }}
-                />
+                    <PromotionOverlay
+                        pendingPromotion={pendingPromotion}
+                        turn={turn}
+                        boardOrientation={boardOrientation}
+                        applyMove={applyMove}
+                        cancelPromotion={cancelPromotion}
+                    />
 
-                <PromotionOverlay
-                    pendingPromotion={pendingPromotion}
-                    turn={turn}
-                    boardOrientation={boardOrientation}
-                    applyMove={applyMove}
-                    cancelPromotion={cancelPromotion}
-                />
+                    <GameOverOverlay
+                        gameStatus={gameStatus}
+                        onReset={handleReset}
+                    />
 
-                <GameOverOverlay
-                    gameStatus={gameStatus}
-                    onReset={handleReset}
-                />
+                    <div className="grid grid-cols-1">
+                        <div className="grid grid-cols-2">
+                            <TurnIndicator turn={turn} />
+                            <div className="text-right">
+                                <MoveCounter moveNumber={moveNumber} />
+                            </div>
+                        </div>
 
-                <div className="grid grid-cols-1">
-                    <div className="grid grid-cols-2">
-                        <TurnIndicator turn={turn} />
-                        <div className="text-right">
-                            <MoveCounter moveNumber={moveNumber} />
+                        <div className="w-full flex justify-center">
+                            <button
+                                onClick={handleReset}
+                                className="hover:cursor-pointer active:!bg-gray-300 rounded-2xl"
+                            >
+                                New Game
+                            </button>
                         </div>
                     </div>
-
-                    <div className="w-full flex justify-center">
-                        <button
-                            onClick={handleReset}
-                            className="hover:cursor-pointer"
-                        >
-                            New Game
-                        </button>
-                    </div>
                 </div>
-
             </div>
 
+            {/* Right column: Captured pieces */}
             <div className="self-stretch w-32">
                 <CapturedPieces
                     capturedPieces={capturedPieces}
@@ -343,7 +355,6 @@ function ChessGame({
                     materialDiff={materialDiff}
                 />
             </div>
-
         </div>
     );
 }
