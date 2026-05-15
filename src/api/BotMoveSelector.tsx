@@ -1,4 +1,4 @@
-﻿import StockfishWorker from "./stockfish-18-lite.js?worker";
+﻿import StockfishWorker from "../api/stockfish-18-lite.js?worker";
 
 function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
     return new Promise((resolve) => {

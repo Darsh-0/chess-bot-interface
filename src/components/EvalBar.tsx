@@ -1,5 +1,5 @@
 ﻿import { useEffect, useRef, useState, useCallback } from "react";
-import StockfishWorker from "./stockfish-18-lite.js?worker";
+import StockfishWorker from "../api/stockfish-18-lite.js?worker";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
