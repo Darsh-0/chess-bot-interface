@@ -1,8 +1,8 @@
 ﻿import { Chessboard } from "react-chessboard";
 import { useChessGame } from "./UseChessGame.tsx";
-import {useState, useEffect, useMemo} from "react";
 import type {PieceSymbol, Square } from "chess.js";
 import EvalBar from "./EvalBar.tsx";
+import type {PlayerType} from "../App.tsx";
 const pieces = import.meta.glob("../assets/pieces/*.svg", {
     eager: true,
     import: "default",
@@ -252,7 +252,6 @@ function GameOverOverlay({ gameStatus, onReset }: {
 
 function ChessGame({
                        humanPlaysAs,
-                       setHumanPlaysAs,
                        whitePlayer,
                        setWhitePlayer,
                        blackPlayer,
@@ -260,13 +259,10 @@ function ChessGame({
                        showEvalBar,
                    }: {
     humanPlaysAs: "white" | "black" | "random";
-    setHumanPlaysAs: React.Dispatch<
-        React.SetStateAction<"white" | "black" | "random">
-    >;
     whitePlayer: string;
-    setWhitePlayer: React.Dispatch<React.SetStateAction<string>>;
+    setWhitePlayer: React.Dispatch<React.SetStateAction<PlayerType>>;
     blackPlayer: string;
-    setBlackPlayer: React.Dispatch<React.SetStateAction<string>>;
+    setBlackPlayer: React.Dispatch<React.SetStateAction<PlayerType>>;
     showEvalBar: boolean;
 }) {
 
@@ -312,7 +308,7 @@ function ChessGame({
             {/* Center column: EvalBar + Board side by side */}
             <div className="flex items-start gap-2">
                 <div className={`doodle ${showEvalBar ? "" : "invisible"}`}>
-                    <EvalBar fen={chessFEN} orientation={boardOrientation} depth={15} height={480} />
+                    <EvalBar fen={chessFEN} orientation={boardOrientation} depth={15}/>
                 </div>
                 <div className="doodle-border doodle relative w-fit rounded-lg">
                     <Chessboard

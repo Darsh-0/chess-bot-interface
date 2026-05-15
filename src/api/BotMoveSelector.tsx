@@ -1,4 +1,4 @@
-﻿function SelectMove(fen: string, bot: string): Promise<{string: string }> {
+﻿function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
     return new Promise((resolve) => {
         const engine = new Worker(new URL("/stockfish-18-lite.js", import.meta.url));
 

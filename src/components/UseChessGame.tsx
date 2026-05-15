@@ -58,9 +58,7 @@ export function useChessGame(whitePlayer: string, blackPlayer: string) {
     }
 
     useEffect(() => {
-        const chess = chessRef.current;
-
-        if (isBotTurn) {
+        if (isBotTurn()) {
             applyBotMove();
         }
     }, [position, whitePlayer, blackPlayer]);
