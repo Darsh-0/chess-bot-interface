@@ -1,4 +1,5 @@
 ﻿import { useEffect, useRef, useState, useCallback } from "react";
+import StockfishWorker from "./stockfish-18-lite.js?worker";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ export default function EvalBar({
 
             setThinking(true);
 
-            const worker = new Worker(new URL("/stockfish-18-lite.js", import.meta.url), {type: "module"});
+            const worker = new StockfishWorker;
             engineRef.current = worker;
             const stm = sideToMove(currentFen);
 
