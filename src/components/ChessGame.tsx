@@ -254,12 +254,20 @@ function ChessGame({
                        humanPlaysAs,
                        setHumanPlaysAs,
                        whitePlayer,
+                       setWhitePlayer,
                        blackPlayer,
+                       setBlackPlayer,
                        showEvalBar,
                    }: {
     humanPlaysAs: "white" | "black" | "random";
+    setHumanPlaysAs: React.Dispatch<
+        React.SetStateAction<"white" | "black" | "random">
+    >;
     whitePlayer: string;
+    setWhitePlayer: React.Dispatch<React.SetStateAction<string>>;
     blackPlayer: string;
+    setBlackPlayer: React.Dispatch<React.SetStateAction<string>>;
+    showEvalBar: boolean;
 }) {
 
     const {
@@ -279,18 +287,22 @@ function ChessGame({
         chessFEN
     } = useChessGame(whitePlayer, blackPlayer);
 
-    const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
-    useEffect(() => {
-        if (humanPlaysAs === "random") {
-            setHumanPlaysAs(Math.random() > 0.5 ? "white" : "black");
-        } else {
-            setBoardOrientation(humanPlaysAs);
-        }
-        console.log(humanPlaysAs);
-    }, [humanPlaysAs]);
+    const boardOrientation: "white" | "black" =
+        whitePlayer === "human"
+            ? "white"
+            : blackPlayer === "human"
+                ? "black"
+                : "white";
 
     function handleReset() {
         resetGame();
+
+        if (humanPlaysAs === "random") {
+            const oldWhitePlayer = whitePlayer;
+
+            setWhitePlayer(blackPlayer);
+            setBlackPlayer(oldWhitePlayer);
+        }
     }
 
     return (

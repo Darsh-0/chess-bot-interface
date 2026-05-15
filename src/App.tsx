@@ -44,7 +44,7 @@ function App() {
                 </div>
 
                 <div className="w-[800px]">
-                    <ChessGame humanPlaysAs={humanPlaysAs} setHumanPlaysAs={setHumanPlaysAs} whitePlayer={whitePlayer} blackPlayer={blackPlayer} showEvalBar={showEvalBar}/>
+                    <ChessGame humanPlaysAs={humanPlaysAs} setHumanPlaysAs={setHumanPlaysAs} whitePlayer={whitePlayer} setWhitePlayer={setWhitePlayer} blackPlayer={blackPlayer} setBlackPlayer={setBlackPlayer} showEvalBar={showEvalBar}/>
                 </div>
             </div>
         </>

@@ -37,7 +37,7 @@ function OptionsPicker({
             <legend>Options picker</legend>
 
             <div className="flex items-center gap-3">
-                <p>player one is</p>
+                <p>white is</p>
 
                 <select
                     className="doodle-border"
@@ -55,7 +55,7 @@ function OptionsPicker({
             </div>
 
             <div className="flex items-center gap-3">
-                <p>player two is</p>
+                <p>black is</p>
 
                 <select
                     className="doodle-border"
