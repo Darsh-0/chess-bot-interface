@@ -9,7 +9,6 @@ interface EvalScore {
 
 interface EvalBarProps {
     fen: string;
-    orientation?: "white" | "black"; // which colour sits at the bottom of the board
     depth?: number;                   // search depth (default 15)
 }
 
@@ -53,7 +52,6 @@ function formatScore(score: EvalScore | null): string {
 
 export default function EvalBar({
                                     fen,
-                                    orientation = "white",
                                     depth = 15,
                                 }: EvalBarProps) {
     const [score, setScore] = useState<EvalScore | null>(null);
@@ -124,14 +122,14 @@ export default function EvalBar({
 
     const whitePct = scoreToWhitePct(score);
     // If board is flipped, black is at the bottom → invert which end grows
-    const bottomPct = orientation === "white" ? whitePct : 100 - whitePct;
+    const bottomPct = 100 - whitePct;
     // The "top" slice is always the opponent of whoever is at the bottom
-    const topPct = 100 - bottomPct;
+    const topPct = whitePct;
 
     const label = formatScore(score);
     const whiteWinning = (score?.value ?? 0) >= 0;
     // Label floats near the boundary, inside the larger section
-    const labelOnTop = orientation === "white" ? !whiteWinning : whiteWinning;
+    const labelOnTop = !whiteWinning
 
     return (
         <div style={styles.wrapper}>

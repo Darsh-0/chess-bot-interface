@@ -308,7 +308,7 @@ function ChessGame({
             {/* Center column: EvalBar + Board side by side */}
             <div className="flex items-start gap-2">
                 <div className={`doodle ${showEvalBar ? "" : "invisible"}`}>
-                    <EvalBar fen={chessFEN} orientation={boardOrientation} depth={15}/>
+                    <EvalBar fen={chessFEN} depth={15}/>
                 </div>
                 <div className="doodle-border doodle relative w-fit rounded-lg">
                     <Chessboard
