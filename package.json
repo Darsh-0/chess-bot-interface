@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "chess.js": "^1.4.0",
+    "coi-serviceworker": "^0.1.7",
     "doodle.css": "^0.0.2",
     "react": "^19.2.6",
     "react-chessboard": "^5.10.0",

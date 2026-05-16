@@ -1,8 +1,6 @@
-﻿import StockfishWorker from "../api/stockfish-18-lite.js?worker";
-
 function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
     return new Promise((resolve) => {
-        const engine = new StockfishWorker;
+        const engine = new Worker('/stockfish.js')
 
         if (bot === "stockfish") {
 
