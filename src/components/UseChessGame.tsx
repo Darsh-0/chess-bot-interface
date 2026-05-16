@@ -57,8 +57,10 @@ export function useChessGame(whitePlayer: string, blackPlayer: string) {
         return false;
     }
 
+
     useEffect(() => {
-        if (isBotTurn()) {
+        const chess = chessRef.current;
+        if (isBotTurn() && !chess.isGameOver()) {
             applyBotMove();
         }
     }, [position, whitePlayer, blackPlayer]);
@@ -149,7 +151,7 @@ export function useChessGame(whitePlayer: string, blackPlayer: string) {
             setGameStatus(checkGameStatus(chess));
             setMoveFrom("");
             setOptionSquares({});
-            if (!checkHumanTurn()) {
+            if (!checkHumanTurn() && !chess.isGameOver()) {
                 applyBotMove();
             }
         } catch {
