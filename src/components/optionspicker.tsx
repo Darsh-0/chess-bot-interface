@@ -32,6 +32,14 @@ function OptionsPicker({
         }
     }, [showHumanSideSelect, setHumanPlaysAs]);
 
+    useEffect(() => {
+        if (humanPlaysAs === "white" || humanPlaysAs === "black") {
+            const temp = whitePlayer;
+            setWhitePlayer(blackPlayer);
+            setBlackPlayer(temp);
+        }
+    }, [humanPlaysAs]);
+
     return (
         <fieldset className="doodle-border flex flex-col gap-4 pt-5">
             <legend>Options picker</legend>
