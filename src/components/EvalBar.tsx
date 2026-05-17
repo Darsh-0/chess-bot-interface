@@ -10,6 +10,7 @@ interface EvalScore {
 interface EvalBarProps {
     fen: string;
     depth?: number;                   // search depth (default 15)
+    height?: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -53,7 +54,58 @@ function formatScore(score: EvalScore | null): string {
 export default function EvalBar({
                                     fen,
                                     depth = 15,
+                                    height = 644,
                                 }: EvalBarProps) {
+
+    const styles: Record<string, React.CSSProperties> = {
+        wrapper: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            userSelect: "none",
+            height: "100%",
+        },
+        track: {
+            position: "relative",
+            width: 30,
+            height: height,
+            borderRadius: 4,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+            border: "1px solid rgba(255,255,255,0.06)",
+        },
+        slice: {
+            width: "100%",
+            flexShrink: 0,
+        },
+        label: {
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: "0.03em",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+            // Slight text shadow so it's readable in both sections
+            textShadow: "0 1px 3px rgba(0,0,0,0.4)",
+            transition: "top 0.4s, bottom 0.4s, color 0.4s",
+        },
+        thinkingDot: {
+            position: "absolute",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            background: "#81b64c",
+            animation: "pulse 1s ease-in-out infinite",
+            boxShadow: "0 0 6px #81b64c",
+        },
+    };
+
     const [score, setScore] = useState<EvalScore | null>(null);
     const [thinking, setThinking] = useState(false);
     const engineRef = useRef<Worker | null>(null);
@@ -122,9 +174,8 @@ export default function EvalBar({
 
     const whitePct = scoreToWhitePct(score);
     // If board is flipped, black is at the bottom → invert which end grows
-    const bottomPct = 100 - whitePct;
-    // The "top" slice is always the opponent of whoever is at the bottom
-    const topPct = whitePct;
+    const bottomPct = whitePct;
+    const topPct = 100 - whitePct;
 
     const label = formatScore(score);
     const whiteWinning = (score?.value ?? 0) >= 0;
@@ -183,53 +234,7 @@ export default function EvalBar({
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles: Record<string, React.CSSProperties> = {
-    wrapper: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        userSelect: "none",
-    },
-    track: {
-        position: "relative",
-        width: 30,
-        height: 644,
-        borderRadius: 4,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(255,255,255,0.06)",
-    },
-    slice: {
-        width: "100%",
-        flexShrink: 0,
-    },
-    label: {
-        position: "absolute",
-        left: "50%",
-        transform: "translateX(-50%)",
-        fontSize: 9,
-        fontWeight: 700,
-        letterSpacing: "0.03em",
-        whiteSpace: "nowrap",
-        pointerEvents: "none",
-        // Slight text shadow so it's readable in both sections
-        textShadow: "0 1px 3px rgba(0,0,0,0.4)",
-        transition: "top 0.4s, bottom 0.4s, color 0.4s",
-    },
-    thinkingDot: {
-        position: "absolute",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 6,
-        height: 6,
-        borderRadius: "50%",
-        background: "#81b64c",
-        animation: "pulse 1s ease-in-out infinite",
-        boxShadow: "0 0 6px #81b64c",
-    },
-};
+
 
 /*
   Add this to your global CSS (e.g. index.css):

@@ -1,5 +1,6 @@
 ﻿import { Chessboard } from "react-chessboard";
 import { useChessGame } from "./UseChessGame.tsx";
+import { useRef, useEffect, useState } from "react";
 import type {PieceSymbol, Square } from "chess.js";
 import EvalBar from "./EvalBar.tsx";
 import type {PlayerType} from "../App.tsx";
@@ -283,6 +284,18 @@ function ChessGame({
         chessFEN
     } = useChessGame(whitePlayer, blackPlayer);
 
+    const boardRef = useRef<HTMLDivElement>(null);
+    const [boardHeight, setBoardHeight] = useState(644);
+
+    useEffect(() => {
+        if (!boardRef.current) return;
+        const ro = new ResizeObserver(entries => {
+            setBoardHeight(entries[0].contentRect.height);
+        });
+        ro.observe(boardRef.current);
+        return () => ro.disconnect();
+    }, []);
+
     const boardOrientation: "white" | "black" =
         whitePlayer === "human"
             ? "white"
@@ -306,11 +319,11 @@ function ChessGame({
             <div />
 
             {/* Center column: EvalBar + Board side by side */}
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2">  {/* ← back to items-start */}
                 <div className={`doodle ${showEvalBar ? "" : "invisible"}`}>
-                    <EvalBar fen={chessFEN} depth={15}/>
+                    <EvalBar fen={chessFEN} depth={15} height={boardHeight} />  {/* ← pass height */}
                 </div>
-                <div className="doodle-border doodle relative w-fit rounded-lg">
+                <div ref={boardRef} className="doodle-border doodle relative w-fit rounded-lg">
                     <Chessboard
                         options={{
                             position,

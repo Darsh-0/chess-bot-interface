@@ -11,16 +11,9 @@ export type PlayerType =
     | "darshfish";
 
 function App() {
-
-    const [whitePlayer, setWhitePlayer] =
-        useState<PlayerType>("human");
-
-    const [blackPlayer, setBlackPlayer] =
-        useState<PlayerType>("stockfish");
-
-    const [humanPlaysAs, setHumanPlaysAs] =
-        useState<"white" | "black" | "random">("white");
-
+    const [whitePlayer, setWhitePlayer] = useState<PlayerType>("human");
+    const [blackPlayer, setBlackPlayer] = useState<PlayerType>("stockfish");
+    const [humanPlaysAs, setHumanPlaysAs] = useState<"white" | "black" | "random">("white");
     const [showEvalBar, setShowEvalBar] = useState(true);
 
     return (
@@ -29,8 +22,10 @@ function App() {
                 <NavigationBar />
             </div>
 
-            <div className="relative flex items-center justify-center pt-10">
-                <div className="absolute left-5">
+            {/* Stack vertically on small screens, side-by-side on large */}
+            <div className="flex flex-col items-center gap-6 px-4 pt-10 lg:flex-row lg:items-start lg:justify-center">
+
+                <div className="w-full max-w-xs lg:w-auto lg:max-w-none">
                     <OptionsPicker
                         whitePlayer={whitePlayer}
                         blackPlayer={blackPlayer}
@@ -43,9 +38,18 @@ function App() {
                     />
                 </div>
 
-                <div className="w-[800px]">
-                    <ChessGame humanPlaysAs={humanPlaysAs} whitePlayer={whitePlayer} setWhitePlayer={setWhitePlayer} blackPlayer={blackPlayer} setBlackPlayer={setBlackPlayer} showEvalBar={showEvalBar}/>
+                {/* Board: fluid up to 800px */}
+                <div className="w-full max-w-[800px]">
+                    <ChessGame
+                        humanPlaysAs={humanPlaysAs}
+                        whitePlayer={whitePlayer}
+                        setWhitePlayer={setWhitePlayer}
+                        blackPlayer={blackPlayer}
+                        setBlackPlayer={setBlackPlayer}
+                        showEvalBar={showEvalBar}
+                    />
                 </div>
+
             </div>
         </>
     );
