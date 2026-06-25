@@ -1,19 +1,30 @@
 let dotnetExports: any = null;
 let dotnetLoading: Promise<any> | null = null;
 
-async function loadDotnet() {
-    while (!(globalThis as any).__dotnet__) {
-        await new Promise(r => setTimeout(r, 50));
-    }
-    const dotnet = (globalThis as any).__dotnet__;
-    const { getAssemblyExports, getConfig } = await dotnet
-        .withConfig({
-            configSrc: '/AppBundle/_framework/dotnet.boot.js',
-            scriptDirectory: '/AppBundle/_framework/'
-        })
-        .withApplicationArguments()
-        .create();
-    return await getAssemblyExports(getConfig().mainAssemblyName);
+function loadDotnet(): Promise<any> {
+    if (dotnetExports) return Promise.resolve(dotnetExports);
+    if (dotnetLoading) return dotnetLoading;
+
+    dotnetLoading = (async () => {
+        while (!(globalThis as any).__dotnet__) {
+            await new Promise(r => setTimeout(r, 50));
+        }
+
+        const dotnet = (globalThis as any).__dotnet__;
+
+        const { getAssemblyExports, getConfig } = await dotnet
+            .withConfig({
+                configSrc: '/_framework/dotnet.boot.js',
+            })
+            .create();
+
+        const config = getConfig();
+        const exports = await getAssemblyExports(config.mainAssemblyName);
+        dotnetExports = exports;
+        return exports;
+    })();
+
+    return dotnetLoading;
 }
 
 function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
