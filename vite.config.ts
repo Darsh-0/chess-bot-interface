@@ -15,6 +15,13 @@ export default defineConfig({
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp"
+    },
+    fs: {
+      allow: ['..']
     }
-  }
+  },
+  optimizeDeps: {
+    exclude: ['./src/api/AppBundle/_framework/dotnet.js']
+  },
+  assetsInclude: ['**/*.wasm']
 })
