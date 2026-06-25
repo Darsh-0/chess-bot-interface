@@ -6,6 +6,11 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   base: "./",
+  build: {
+    rollupOptions: {
+      external: ['/AppBundle/_framework/dotnet.js'],
+    }
+  },
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
