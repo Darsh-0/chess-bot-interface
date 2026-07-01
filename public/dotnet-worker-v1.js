@@ -1,11 +1,11 @@
-﻿import { dotnet } from '/_framework-v2/dotnet.js';
+﻿import { dotnet } from '/_framework/dotnet.js';
 
 let exportsPromise = null;
 
 async function init() {
     const { getAssemblyExports, getConfig } = await dotnet
         .withConfig({
-            configSrc: '/_framework-v2/dotnet.boot.js',
+            configSrc: '/_framework/dotnet.boot.js',
         })
         .create();
 
@@ -21,7 +21,7 @@ self.onmessage = async (event) => {
             exportsPromise = init();
         }
         const exports = await exportsPromise;
-        const move = await exports.chessEngine.ChessEngine.GetBestMove(fen);
+        const move = await exports.chessEngine.ChessEngine.GetRandomMove(fen);
         self.postMessage({ id, bestmove: move });
     } catch (err) {
         self.postMessage({ id, error: String(err) });

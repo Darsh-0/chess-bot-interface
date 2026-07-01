@@ -5232,7 +5232,6 @@ var _mono_wasm_assembly_load = Module['_mono_wasm_assembly_load'] = (a0) => (_mo
 var _mono_wasm_assembly_find_class = Module['_mono_wasm_assembly_find_class'] = (a0, a1, a2) => (_mono_wasm_assembly_find_class = Module['_mono_wasm_assembly_find_class'] = wasmExports['mono_wasm_assembly_find_class'])(a0, a1, a2);
 var _mono_wasm_assembly_find_method = Module['_mono_wasm_assembly_find_method'] = (a0, a1, a2) => (_mono_wasm_assembly_find_method = Module['_mono_wasm_assembly_find_method'] = wasmExports['mono_wasm_assembly_find_method'])(a0, a1, a2);
 var _mono_aot_chessEngine_get_method = Module['_mono_aot_chessEngine_get_method'] = (a0) => (_mono_aot_chessEngine_get_method = Module['_mono_aot_chessEngine_get_method'] = wasmExports['mono_aot_chessEngine_get_method'])(a0);
-var _mono_aot_System_Console_get_method = Module['_mono_aot_System_Console_get_method'] = (a0) => (_mono_aot_System_Console_get_method = Module['_mono_aot_System_Console_get_method'] = wasmExports['mono_aot_System_Console_get_method'])(a0);
 var _memset = Module['_memset'] = (a0, a1, a2) => (_memset = Module['_memset'] = wasmExports['memset'])(a0, a1, a2);
 var _fmodf = Module['_fmodf'] = (a0, a1) => (_fmodf = Module['_fmodf'] = wasmExports['fmodf'])(a0, a1);
 var _mono_aot_corlib_get_method = Module['_mono_aot_corlib_get_method'] = (a0) => (_mono_aot_corlib_get_method = Module['_mono_aot_corlib_get_method'] = wasmExports['mono_aot_corlib_get_method'])(a0);

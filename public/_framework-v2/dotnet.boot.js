@@ -1,7 +1,7 @@
 export const config = /*json-start*/{
   "mainAssemblyName": "chessEngine.dll",
   "resources": {
-    "hash": "sha256-lqBfhwI/kvyrj2yUt6QEY1KVBeZy10NIm0Rem1kf+d8=",
+    "hash": "sha256-d9Xl5TbFD4jUHRVOc08+4x+SkQ3g9lRB/joEfbDdaug=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.js"
@@ -15,24 +15,19 @@ export const config = /*json-start*/{
     "wasmNative": [
       {
         "name": "dotnet.native.wasm",
-        "hash": "sha256-Il+E3bdKxX2kUAeBbKdy12tNXkOzwBgw7Z4EBol7bxg="
+        "hash": "sha256-LoOVkmSTnRs4/dZE/kS5yJ9J1AG1/tb/JKjX29Co9Hw="
       }
     ],
     "coreAssembly": [
       {
         "virtualPath": "chessEngine.wasm",
         "name": "chessEngine.wasm",
-        "hash": "sha256-+r+rdMB6pOPEUCSlbKO6WmPpV1tL1OnK7FGMRVgzxag="
-      },
-      {
-        "virtualPath": "System.Console.wasm",
-        "name": "System.Console.wasm",
-        "hash": "sha256-ycZRS/3Pg04bSMigcgL4HcdGWosXtfmkttwZRy8ubp0="
+        "hash": "sha256-7pViHKd0Y1Tjl40YGOZX8mvkZffP6HPBRTiy2tdlSWk="
       },
       {
         "virtualPath": "System.Private.CoreLib.wasm",
         "name": "System.Private.CoreLib.wasm",
-        "hash": "sha256-UotFo4pBFYRuTY9OanzLBcY2PYc/Y0owQM8OBoXxOJg="
+        "hash": "sha256-Q0JFHUcuQsYLbrMcUvIHf+t47oOYU+KSRekyS22u/RM="
       },
       {
         "virtualPath": "System.Runtime.InteropServices.JavaScript.wasm",

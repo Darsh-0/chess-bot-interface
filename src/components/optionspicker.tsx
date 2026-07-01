@@ -107,6 +107,8 @@ function OptionsPicker({
                 />
             </div>
 
+            <p class="w-64">Initial bot loading may take a few seconds</p>
+
             {/* Human side picker — slides in when relevant */}
             {showHumanSideSelect && (
                 <div className="flex flex-col gap-1">
