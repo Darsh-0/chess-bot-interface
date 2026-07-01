@@ -107,7 +107,7 @@ function OptionsPicker({
                 />
             </div>
 
-            <p class="w-64">Initial bot loading may take a few seconds</p>
+            <p className="w-64">Initial bot loading may take a few seconds</p>
 
             {/* Human side picker — slides in when relevant */}
             {showHumanSideSelect && (
