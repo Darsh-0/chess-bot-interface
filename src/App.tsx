@@ -5,12 +5,14 @@ import NavigationBar from "./components/navigationbar.tsx";
 import OptionsPicker from "./components/optionspicker.tsx";
 import {useState} from "react";
 
+
 export type PlayerType =
     | "human"
     | "stockfish"
     | "darshfish";
 
 function App() {
+
     const [whitePlayer, setWhitePlayer] = useState<PlayerType>("human");
     const [blackPlayer, setBlackPlayer] = useState<PlayerType>("stockfish");
     const [humanPlaysAs, setHumanPlaysAs] = useState<"white" | "black" | "random">("white");

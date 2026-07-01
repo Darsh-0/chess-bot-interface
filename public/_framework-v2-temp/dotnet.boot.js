@@ -1,7 +1,7 @@
 export const config = /*json-start*/{
   "mainAssemblyName": "chessEngine.dll",
   "resources": {
-    "hash": "sha256-lqBfhwI/kvyrj2yUt6QEY1KVBeZy10NIm0Rem1kf+d8=",
+    "hash": "sha256-cjHs7zfk/uCfWHB1WpSR/sKut0W23DimLG5uWgCFiQA=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.js"
@@ -15,40 +15,58 @@ export const config = /*json-start*/{
     "wasmNative": [
       {
         "name": "dotnet.native.wasm",
-        "hash": "sha256-Il+E3bdKxX2kUAeBbKdy12tNXkOzwBgw7Z4EBol7bxg="
+        "hash": "sha256-yGBhEfRyBXN977seuCBLPCDFy7unzQ1BSJuVx6Tx5ZI="
+      }
+    ],
+    "wasmSymbols": [
+      {
+        "name": "dotnet.native.js.symbols"
+      }
+    ],
+    "icu": [
+      {
+        "virtualPath": "icudt_CJK.dat",
+        "name": "icudt_CJK.dat",
+        "hash": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk="
+      },
+      {
+        "virtualPath": "icudt_EFIGS.dat",
+        "name": "icudt_EFIGS.dat",
+        "hash": "sha256-8fItetYY8kQ0ww6oxwTLiT3oXlBwHKumbeP2pRF4yTc="
+      },
+      {
+        "virtualPath": "icudt_no_CJK.dat",
+        "name": "icudt_no_CJK.dat",
+        "hash": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
       }
     ],
     "coreAssembly": [
       {
-        "virtualPath": "chessEngine.wasm",
-        "name": "chessEngine.wasm",
-        "hash": "sha256-+r+rdMB6pOPEUCSlbKO6WmPpV1tL1OnK7FGMRVgzxag="
-      },
-      {
-        "virtualPath": "System.Console.wasm",
-        "name": "System.Console.wasm",
-        "hash": "sha256-ycZRS/3Pg04bSMigcgL4HcdGWosXtfmkttwZRy8ubp0="
-      },
-      {
         "virtualPath": "System.Private.CoreLib.wasm",
         "name": "System.Private.CoreLib.wasm",
-        "hash": "sha256-UotFo4pBFYRuTY9OanzLBcY2PYc/Y0owQM8OBoXxOJg="
+        "hash": "sha256-R16HGDw1q+HCM3iZQ72oTX0CLUphwXpuTukKge62US4="
       },
       {
         "virtualPath": "System.Runtime.InteropServices.JavaScript.wasm",
         "name": "System.Runtime.InteropServices.JavaScript.wasm",
-        "hash": "sha256-l55EbkI9WMhgTlEsWFrJPbDd7Dh14l2tg9/VrOluo+0="
-      },
-      {
-        "virtualPath": "aot-instances.wasm",
-        "name": "aot-instances.wasm",
-        "hash": "sha256-ZKYH8qGQXmng3POhMUcorr9bMYF+uQANtiduldY9GFo="
+        "hash": "sha256-gz7n0pHsXI0nLgNuzvoc+JcIHClmIYbabkm315IUuFU="
       }
     ],
-    "assembly": []
+    "assembly": [
+      {
+        "virtualPath": "chessEngine.wasm",
+        "name": "chessEngine.wasm",
+        "hash": "sha256-u+HXkafGyB/uKDcSDUQJznlmdQoz727Tn9BKZ5KenGo="
+      },
+      {
+        "virtualPath": "System.Console.wasm",
+        "name": "System.Console.wasm",
+        "hash": "sha256-33xKsJfAiS9cIrBklPPyhzvpSYhUSB7ruDExujqwJgU="
+      }
+    ]
   },
   "debugLevel": 0,
-  "globalizationMode": "invariant",
+  "globalizationMode": "sharded",
   "runtimeConfig": {
     "runtimeOptions": {
       "configProperties": {
@@ -61,9 +79,8 @@ export const config = /*json-start*/{
         "System.Diagnostics.Debugger.IsSupported": false,
         "System.Diagnostics.Metrics.Meter.IsSupported": false,
         "System.Diagnostics.Tracing.EventSource.IsSupported": false,
-        "System.Globalization.Invariant": true,
+        "System.Globalization.Invariant": false,
         "System.TimeZoneInfo.Invariant": false,
-        "System.Globalization.PredefinedCulturesOnly": true,
         "System.Linq.Enumerable.IsSizeOptimized": true,
         "System.Net.Http.EnableActivityPropagation": false,
         "System.Net.Http.WasmEnableStreamingResponse": true,
