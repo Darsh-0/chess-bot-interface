@@ -8,7 +8,7 @@ export default defineConfig({
   base: "./",
   build: {
     rollupOptions: {
-      external: ['/AppBundle/_framework/dotnet.js'],
+      external: ['/AppBundle/_framework/dotnet.js', '/AppBundle/_framework-v2/dotnet.js'],
     }
   },
   plugins: [
@@ -26,7 +26,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['./src/api/AppBundle/_framework/dotnet.js']
+    exclude: ['./src/api/AppBundle/_framework/dotnet.js', './src/api/AppBundle/_framework-v2/dotnet.js']
   },
   assetsInclude: ['**/*.wasm']
 })
