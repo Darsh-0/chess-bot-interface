@@ -4,11 +4,11 @@ import './index.css'
 import App from './App.tsx'
 import 'doodle.css/doodle.css'
 
-import { preloadDotnetV1 } from './api/BotMoveSelector.tsx';
-import { preloadDotnetV2 } from './api/BotMoveSelector.tsx';
+import { preloadDotnetV1, preloadDotnetV2, preloadDotnetV3 } from './api/BotMoveSelector.tsx';
 
 preloadDotnetV1();
 preloadDotnetV2();
+preloadDotnetV3();
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

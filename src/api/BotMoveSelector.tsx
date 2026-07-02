@@ -1,88 +1,67 @@
-let dotnetWorkerV1: Worker | null = null;
-let requestIdV1 = 0;
-const pendingRequestsV1 = new Map<number, { resolve: (v: string) => void; reject: (e: any) => void }>();
+type PendingMap = Map<number, { resolve: (v: string) => void; reject: (e: any) => void }>;
 
-export function getDotnetWorkerV1(): Worker {
-    if (dotnetWorkerV1) return dotnetWorkerV1;
+function createEngineWorker(scriptUrl: string) {
+    let worker: Worker | null = null;
+    let requestId = 0;
+    const pending: PendingMap = new Map();
 
-    dotnetWorkerV1 = new Worker('/dotnet-worker-v1.js', { type: 'module' });
+    function getWorker(): Worker {
+        if (worker) return worker;
 
-    dotnetWorkerV1.onmessage = (event) => {
-        const { id, bestmove, error } = event.data;
-        const pending = pendingRequestsV1.get(id);
-        if (!pending) return;
-        pendingRequestsV1.delete(id);
-        if (error) pending.reject(new Error(error));
-        else pending.resolve(bestmove);
-    };
+        worker = new Worker(scriptUrl, { type: 'module' });
 
-    dotnetWorkerV1.onerror = (err) => {
-        for (const pending of pendingRequestsV1.values()) {
-            pending.reject(err);
-        }
-        pendingRequestsV1.clear();
-    };
+        worker.onmessage = (event) => {
+            const { id, bestmove, error } = event.data;
+            const p = pending.get(id);
+            if (!p) return;
+            pending.delete(id);
+            if (error) p.reject(new Error(error));
+            else p.resolve(bestmove);
+        };
 
-    return dotnetWorkerV1;
+        worker.onerror = (err) => {
+            for (const p of pending.values()) {
+                p.reject(err);
+            }
+            pending.clear();
+        };
+
+        return worker;
+    }
+
+    function getMove(fen: string): Promise<string> {
+        const w = getWorker();
+        const id = requestId++;
+
+        return new Promise((resolve, reject) => {
+            pending.set(id, { resolve, reject });
+            w.postMessage({ id, fen });
+        });
+    }
+
+    function preload(): void {
+        const startingFen = "8/8/8/8/8/8/8/k6K w - - 0 1";
+        getMove(startingFen).catch(err => console.error(`[preload] ${scriptUrl} warmup failed`, err));
+    }
+
+    return { getWorker, getMove, preload };
 }
 
-export function getRandomMoveV1(fen: string): Promise<string> {
-    const worker = getDotnetWorkerV1();
-    const id = requestIdV1++;
+const v1 = createEngineWorker('/dotnet-worker-v1.js');
+const v2 = createEngineWorker('/dotnet-worker-v2.js');
+const v3 = createEngineWorker('/dotnet-worker-v3.js');
 
-    return new Promise((resolve, reject) => {
-        pendingRequestsV1.set(id, { resolve, reject });
-        worker.postMessage({ id, fen });
-    });
-}
+export const getDotnetWorkerV1 = v1.getWorker;
+export const getRandomMoveV1 = v1.getMove;
+export const preloadDotnetV1 = v1.preload;
 
-let dotnetWorkerV2: Worker | null = null;
-let requestId = 0;
-const pendingRequests = new Map<number, { resolve: (v: string) => void; reject: (e: any) => void }>();
+export const getDotnetWorkerV2 = v2.getWorker;
+export const getBestMoveV2 = v2.getMove;
+export const preloadDotnetV2 = v2.preload;
 
-export function preloadDotnetV2(): void {
-    const startingFen = "8/8/8/8/8/8/8/k6K w - - 0 1";
-    getBestMoveV2(startingFen)
-}
-
-export function preloadDotnetV1(): void {
-    const startingFen = "8/8/8/8/8/8/8/k6K w - - 0 1";
-    getRandomMoveV1(startingFen)
-}
-
-function getDotnetWorkerV2(): Worker {
-    if (dotnetWorkerV2) return dotnetWorkerV2;
-
-    dotnetWorkerV2 = new Worker('/dotnet-worker-v2.js', { type: 'module' });
-
-    dotnetWorkerV2.onmessage = (event) => {
-        const { id, bestmove, error } = event.data;
-        const pending = pendingRequests.get(id);
-        if (!pending) return;
-        pendingRequests.delete(id);
-        if (error) pending.reject(new Error(error));
-        else pending.resolve(bestmove);
-    };
-
-    dotnetWorkerV2.onerror = (err) => {
-        for (const pending of pendingRequests.values()) {
-            pending.reject(err);
-        }
-        pendingRequests.clear();
-    };
-
-    return dotnetWorkerV2;
-}
-
-export function getBestMoveV2(fen: string): Promise<string> {
-    const worker = getDotnetWorkerV2();
-    const id = requestId++;
-
-    return new Promise((resolve, reject) => {
-        pendingRequests.set(id, { resolve, reject });
-        worker.postMessage({ id, fen });
-    });
-}
+export const getDotnetWorkerV3 = v3.getWorker;
+export const getBestMoveV3 = v3.getMove;
+export const preloadDotnetV3 = v3.preload;
 
 function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
     return new Promise((resolve, reject) => {
@@ -115,6 +94,11 @@ function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
 
         } else if (bot === "darshfish v2 (Basic Search)") {
             getBestMoveV2(fen)
+                .then(move => resolve({ bestmove: move }))
+                .catch(reject);
+
+        } else if (bot === "darshfish v3 (Smart Search)") {
+            getBestMoveV3(fen)
                 .then(move => resolve({ bestmove: move }))
                 .catch(reject);
         }

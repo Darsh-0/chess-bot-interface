@@ -9,12 +9,16 @@ import {useState} from "react";
 export type PlayerType =
     | "human"
     | "stockfish"
-    | "darshfish";
+    | "darshfish v1 (Random)"
+    | "darshfish v2 (Basic Search)"
+    | "darshfish v3 (Smart Search)";
 
 function App() {
 
     const [whitePlayer, setWhitePlayer] = useState<PlayerType>("human");
-    const [blackPlayer, setBlackPlayer] = useState<PlayerType>("stockfish");
+
+    const [blackPlayer, setBlackPlayer] = useState<PlayerType>("darshfish v3 (Smart Search)");
+
     const [humanPlaysAs, setHumanPlaysAs] = useState<"white" | "black" | "random">("white");
     const [showEvalBar, setShowEvalBar] = useState(true);
 

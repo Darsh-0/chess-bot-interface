@@ -42,7 +42,7 @@ function PlayerSelect({
                     className="w-full appearance-none doodle-border bg-white pl-8 sm:pl-9 pr-6 sm:pr-8 py-2 text-sm font-medium text-gray-800 cursor-pointer
                                focus:outline-none hover:bg-gray-50 transition-colors duration-100 truncate"
                 >
-                    {["human", "stockfish", "darshfish v1 (Random)", "darshfish v2 (Basic Search)"].map((opt) => (
+                    {["human", "stockfish", "darshfish v1 (Random)", "darshfish v2 (Basic Search)", "darshfish v3 (Smart Search)"].map((opt) => (
                         <option key={opt} value={opt}>
                             {opt.charAt(0).toUpperCase() + opt.slice(1)}
                         </option>
@@ -75,12 +75,23 @@ function OptionsPicker({
     }, [showHumanSideSelect, setHumanPlaysAs]);
 
     useEffect(() => {
-        if (humanPlaysAs === "white" || humanPlaysAs === "black") {
-            const temp = whitePlayer;
-            setWhitePlayer(blackPlayer);
-            setBlackPlayer(temp);
-        }
-    }, [humanPlaysAs]);
+        if (humanPlaysAs !== "white" && humanPlaysAs !== "black") return;
+
+        const humanIsWhite = whitePlayer === "human";
+        const humanIsBlack = blackPlayer === "human";
+
+        // No human player on the board — nothing to swap.
+        if (!humanIsWhite && !humanIsBlack) return;
+
+        // Already matches the requested side — do nothing.
+        const alreadyCorrect =
+            (humanPlaysAs === "white" && humanIsWhite) ||
+            (humanPlaysAs === "black" && humanIsBlack);
+        if (alreadyCorrect) return;
+
+        setWhitePlayer(blackPlayer);
+        setBlackPlayer(whitePlayer);
+    }, [humanPlaysAs, whitePlayer, blackPlayer]);
 
     return (
         <div className="doodle-border bg-white rounded-xl p-5 flex flex-col gap-5 m-px min-w-64">
