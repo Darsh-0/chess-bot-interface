@@ -68,7 +68,7 @@ export default function EvalBar({
         track: {
             position: "relative",
             width: 30,
-            height: height,
+            height: `${height}px`,
             borderRadius: 4,
             overflow: "hidden",
             display: "flex",

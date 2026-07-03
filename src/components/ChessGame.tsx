@@ -95,15 +95,14 @@ function CapturedPieces({
         />
     );
 
-    // The bottom player's opponent lost pieces sit at the bottom (what they captured)
-    // white at bottom → black's lost pieces at bottom, white's at top
-    // black at bottom → white's lost pieces at bottom, black's at top
     const [top, bottom] = boardOrientation === "white"
         ? [whiteRow, blackRow]
         : [blackRow, whiteRow];
 
+    // Below the board on narrow screens: side-by-side row.
+    // Beside the board on lg+: stacked column filling the height.
     return (
-        <div className="flex flex-col justify-between h-full gap-4">
+        <div className="flex flex-row lg:flex-col justify-between w-full lg:h-full lg:w-auto gap-4">
             <div>{top}</div>
             <div>{bottom}</div>
         </div>
@@ -125,13 +124,13 @@ function TurnIndicator({ turn }: { turn: Color }) {
                     display: "inline-block",
                 }}
             />
-            <p className="text-2xl">{isWhite ? "White to move" : "Black to move"}</p>
+            <p className="text-[clamp(1rem,4vw,1.5rem)]">{isWhite ? "White to move" : "Black to move"}</p>
         </div>
     );
 }
 
 function MoveCounter({ moveNumber }: { moveNumber: number }) {
-    return <p className="text-2xl">Move Number {moveNumber}</p>;
+    return <p className="text-[clamp(1rem,4vw,1.5rem)]">Move Number {moveNumber}</p>;
 }
 
 function PromotionPicker({ color, targetSquare, boardOrientation, onSelect, onCancel }: {
@@ -290,7 +289,8 @@ function ChessGame({
     useEffect(() => {
         if (!boardRef.current) return;
         const ro = new ResizeObserver(entries => {
-            setBoardHeight(entries[0].contentRect.height);
+            const h = entries[0].contentRect.height;
+            if (h > 0) setBoardHeight(h);
         });
         ro.observe(boardRef.current);
         return () => ro.disconnect();
@@ -315,13 +315,13 @@ function ChessGame({
     }
 
     return (
-        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-8">
-            <div />
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center lg:items-start gap-8">
+            <div className="hidden lg:block" />
 
             {/* Center column: EvalBar + Board side by side */}
-            <div className="flex items-start gap-2">  {/* ← back to items-start */}
+            <div className="flex items-start gap-2">
                 <div className={`doodle ${showEvalBar ? "" : "invisible"}`}>
-                    <EvalBar fen={chessFEN} depth={15} height={boardHeight} />  {/* ← pass height */}
+                    <EvalBar fen={chessFEN} depth={15} height={boardHeight} />
                 </div>
                 <div ref={boardRef} className="doodle-border doodle relative w-fit rounded-lg">
                     <Chessboard
@@ -368,8 +368,8 @@ function ChessGame({
                 </div>
             </div>
 
-            {/* Right column: Captured pieces */}
-            <div className="self-stretch w-32">
+            {/* Captured pieces: row under the board on narrow screens, column beside it on lg+ */}
+            <div className="w-full max-w-[644px] lg:max-w-none lg:w-32 lg:self-stretch">
                 <CapturedPieces
                     capturedPieces={capturedPieces}
                     boardOrientation={boardOrientation}

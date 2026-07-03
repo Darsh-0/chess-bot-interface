@@ -97,7 +97,7 @@ function GitHubDropdown() {
 
 function NavigationBar() {
     return (
-        <nav className="p-4 mx-20 flex justify-between items-center doodle-border bg-white rounded-lg" >
+        <nav className="p-4 mx-[clamp(1.25rem,5vw,5rem)] flex justify-between items-center doodle-border bg-white rounded-lg" >
             <h1 className="text-5xl">Darsh's Chess Bot</h1>
             <GitHubDropdown />
         </nav>
