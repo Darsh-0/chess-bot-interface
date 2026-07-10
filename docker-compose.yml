@@ -7,3 +7,10 @@ services:
     ports:
       - "4174:4174"
     restart: unless-stopped
+    networks:
+      - default
+      - shared-tunnel-net
+
+networks:
+  shared-tunnel-net:
+    external: true
