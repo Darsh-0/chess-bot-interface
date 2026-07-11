@@ -235,7 +235,7 @@ function GameOverOverlay({ gameStatus, onReset }: {
     if (!gameStatus) return null;
     return (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40">
-            <div className="doodle-border p-6 flex flex-col gap-4 text-center bg-white">
+            <div className="doodle-border p-6 m-1 flex flex-col gap-4 text-center bg-white rounded-lg">
                 <p className="text-xl font-bold">Game Over</p>
                 <p>
                     {gameStatus.type === "checkmate" &&

@@ -11,13 +11,14 @@ export type PlayerType =
     | "stockfish"
     | "darshfish v1 (Random)"
     | "darshfish v2 (Basic Search)"
-    | "darshfish v3 (Smart Search)";
+    | "darshfish v3 (Smart Search)"
+    | "darshfish v4 (Quick Search)";
 
 function App() {
 
     const [whitePlayer, setWhitePlayer] = useState<PlayerType>("human");
 
-    const [blackPlayer, setBlackPlayer] = useState<PlayerType>("darshfish v3 (Smart Search)");
+const [blackPlayer, setBlackPlayer] = useState<PlayerType>("darshfish v4 (Quick Search)");
 
     const [humanPlaysAs, setHumanPlaysAs] = useState<"white" | "black" | "random">("white");
     const [showEvalBar, setShowEvalBar] = useState(true);

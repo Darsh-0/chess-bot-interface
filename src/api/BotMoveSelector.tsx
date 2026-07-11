@@ -50,6 +50,7 @@ function createEngineWorker(scriptUrl: string) {
 const v1 = createEngineWorker('/dotnet-worker-v1.js');
 const v2 = createEngineWorker('/dotnet-worker-v2.js');
 const v3 = createEngineWorker('/dotnet-worker-v3.js');
+const v4 = createEngineWorker('/dotnet-worker-v4.js');
 
 export const getDotnetWorkerV1 = v1.getWorker;
 export const getRandomMoveV1 = v1.getMove;
@@ -62,6 +63,10 @@ export const preloadDotnetV2 = v2.preload;
 export const getDotnetWorkerV3 = v3.getWorker;
 export const getBestMoveV3 = v3.getMove;
 export const preloadDotnetV3 = v3.preload;
+
+export const getDotnetWorkerV4 = v4.getWorker;
+export const getBestMoveV4 = v4.getMove;
+export const preloadDotnetV4 = v4.preload;
 
 function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
     return new Promise((resolve, reject) => {
@@ -99,6 +104,10 @@ function SelectMove(fen: string, bot: string): Promise<{ bestmove: string }> {
 
         } else if (bot === "darshfish v3 (Smart Search)") {
             getBestMoveV3(fen)
+                .then(move => resolve({ bestmove: move }))
+                .catch(reject);
+        } else if (bot === "darshfish v4 (Quick Search)") {
+            getBestMoveV4(fen)
                 .then(move => resolve({ bestmove: move }))
                 .catch(reject);
         }
